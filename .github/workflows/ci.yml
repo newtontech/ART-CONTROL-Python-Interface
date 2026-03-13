@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Validate Python syntax
+      run: |
+        python -m py_compile DAM3000M.py
+        echo "Python syntax is valid"
+
+    - name: Check module structure
+      run: |
+        python -c "import ast; ast.parse(open('DAM3000M.py').read())"
+        echo "Module structure is valid"
+
+    - name: Lint
+      run: |
+        pip install flake8
+        flake8 DAM3000M.py --max-line-length=120 || echo "Lint warnings found"
